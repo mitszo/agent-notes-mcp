@@ -1,0 +1,7 @@
+# 個人用 Codex ガイダンス
+
+## 非公開のプロジェクトノート
+
+Git リポジトリで実質的な設計・実装作業を開始または再開する前に、`$project-notes-context` を使う。
+
+このスキルは、agent_notes の `notes-work/rules/` にある共通規約と、対象プロジェクトの `notes-work/projects/<repository>/` ノートを参照する。短い質問、単発の確認、agent_notes または対応するノートが利用できない場合は、この手順を非ブロッキングとして通常どおり作業する。

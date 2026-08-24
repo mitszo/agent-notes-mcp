@@ -22,17 +22,19 @@
 
 ## インストール
 
-開発中はローカルの checkout から導入できます。
+ローカルの checkout から導入する場合:
 
 ```shell
 uv tool install .
 ```
 
-PyPI へ公開後は、リリース済みのパッケージを導入します。
+GitHub の main ブランチから導入する場合:
 
 ```shell
-uv tool install agent-notes-mcp
+uv tool install git+https://github.com/mitszo/agent-notes-mcp.git
 ```
+
+特定のコミットやタグを使う場合は、URL の末尾へ `@<ref>` を追加します。
 
 ## 設定
 
@@ -62,6 +64,18 @@ command = "uv"
 args = ["run", "agent_notes", "--config", "/absolute/path/to/config.toml"]
 ```
 
+## 最初の 5 分
+
+Codex で新しいスレッドを開き、まず次のように依頼してください。
+
+```text
+agent_notes で設定済みの root を確認し、ノートを検索できるか試してください。
+```
+
+Codex は `list_roots`、`search_notes`、`read_note` などの MCP ツールを使えます。書込みを試すときは、設定で許可した狭い `write_roots` 内に新規のテスト用 Markdown ファイルを作るよう依頼してください。
+
+複数の開発リポジトリでノートを引継ぎに使う場合は、[Codex のプロジェクトコンテキスト例](docs/recipes/project-context-for-codex.md) と、コピーして調整できる[スキル例](examples/project-notes-context/)を参照してください。この運用は任意であり、ノートの配置や形式をサーバーが強制することはありません。
+
 ## 安全な更新
 
 既存ノートを置換・移動する前に読込み、返された `sha256` を `expected_sha256` として指定します。その間に内容が変わった場合、サーバーは上書きせず更新を拒否します。
@@ -88,3 +102,7 @@ uv run pytest
 ## ライセンス
 
 [MIT](LICENSE)
+
+## 開発について
+
+このプロジェクトは Codex を開発支援に利用しています。公開前の内容確認と判断はメンテナーが行っています。
