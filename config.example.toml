@@ -1,0 +1,35 @@
+# Copy to ~/.config/agent-notes-mcp/config.toml and adjust the paths.
+# Notes in read_roots are read-only. Notes in write_roots can be searched, read,
+# and edited; they do not need to be repeated in read_roots.
+
+[[read_roots]]
+id = "notes"
+path = "/home/example/Notes"
+exclude = [".obsidian/**", ".trash/**"]
+
+[[write_roots]]
+id = "notes-inbox"
+path = "/home/example/Notes/inbox"
+
+[[write_roots]]
+id = "notes-memos"
+path = "/home/example/Notes/memos"
+
+# Optional: append an agent-supplied one-line summary after a successful note
+# mutation. Every write root is also searchable and readable.
+[[write_roots]]
+id = "notes-journal"
+path = "/home/example/Notes/journal"
+
+# Optional: add a timezone-aware updated field to the YAML frontmatter of every
+# Markdown note changed through this client. Existing frontmatter is preserved;
+# frontmatter is created when absent.
+[note_metadata]
+enabled = true
+timezone = "Asia/Tokyo"
+
+[activity_log]
+enabled = true
+root_id = "notes-journal"
+filename_template = "%Y-%m-%d.md"
+timezone = "Asia/Tokyo"
