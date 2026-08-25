@@ -36,4 +36,4 @@ def resolve_note_path(root: RootConfig, relative_path: str, *, must_exist: bool)
 
 def is_excluded(root: RootConfig, relative_path: PurePosixPath) -> bool:
     """Return whether an in-root relative path matches an exclusion pattern."""
-    return any(relative_path.match(pattern) for pattern in root.exclude)
+    return any(relative_path.full_match(pattern) for pattern in root.exclude)
