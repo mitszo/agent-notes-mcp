@@ -188,3 +188,13 @@ def test_move_allows_different_write_roots(root: RootConfig) -> None:
 def test_rejects_parent_escape(root: RootConfig) -> None:
     with pytest.raises(PathAccessError):
         read_note(root, "../secret.md")
+
+
+def test_read_rejects_excluded_notes_at_any_depth(root: RootConfig) -> None:
+    nested = root.path / ".trash" / "nested"
+    nested.mkdir()
+    (nested / "old.md").write_text("nested old copy", encoding="utf-8")
+
+    for path in (".trash/old.md", ".trash/nested/old.md"):
+        with pytest.raises(PathAccessError, match="excluded"):
+            read_note(root, path)

@@ -34,8 +34,11 @@ class Note:
 def read_note(root: RootConfig, path: str) -> Note:
     """Read a note and calculate the optimistic-concurrency hash."""
     resolved = resolve_note_path(root, path, must_exist=True)
+    relative = PurePosixPath(_relative(root, resolved))
+    if is_excluded(root, relative):
+        raise PathAccessError("The requested note is excluded by this root's configuration.")
     content = resolved.read_text(encoding="utf-8")
-    return Note(path=_relative(root, resolved), content=content, sha256=_hash(content))
+    return Note(path=relative.as_posix(), content=content, sha256=_hash(content))
 
 
 def list_notes(
