@@ -79,6 +79,66 @@ def test_server_can_be_created(tmp_path: Path) -> None:
     )
     assert "top-level scalar" in tool_by_name["search_notes"].description
     assert "Arrays and nested" in tool_by_name["list_notes"].description
+    expected_annotations = {
+        "search_notes": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "read_note": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "list_roots": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "list_notes": {
+            "readOnlyHint": True,
+            "destructiveHint": False,
+            "idempotentHint": True,
+            "openWorldHint": False,
+        },
+        "write_note": {
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+        "append_note": {
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+        "move_note": {
+            "readOnlyHint": False,
+            "destructiveHint": False,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+        "update_managed_blocks": {
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+        "batch_update_notes": {
+            "readOnlyHint": False,
+            "destructiveHint": True,
+            "idempotentHint": False,
+            "openWorldHint": False,
+        },
+    }
+    assert {
+        name: tool.annotations.model_dump(exclude_none=True)
+        for name, tool in tool_by_name.items()
+    } == expected_annotations
 
 
 def test_write_tools_return_compact_results_unless_content_is_requested(
