@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from typing import Literal, NotRequired, TypedDict
 
 from .activity_log import append_activity_log
@@ -21,6 +22,29 @@ from .notes import (
     move_note,
     read_note,
     replace_note,
+)
+
+
+# Declare all four MCP behaviour hints explicitly.  Clients use these advisory
+# hints to present appropriate confirmation and safety UI; they are not an
+# authorization boundary.
+READ_ONLY_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=True,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=False,
+)
+WRITE_NONDESTRUCTIVE_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=False,
+    destructiveHint=False,
+    idempotentHint=False,
+    openWorldHint=False,
+)
+WRITE_DESTRUCTIVE_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=False,
+    destructiveHint=True,
+    idempotentHint=False,
+    openWorldHint=False,
 )
 
 
@@ -267,7 +291,7 @@ def create_server(settings: Settings) -> FastMCP:
         ),
     )
 
-    @server.tool(name="search_notes")
+    @server.tool(name="search_notes", annotations=READ_ONLY_ANNOTATIONS)
     def search_notes_tool(
         query: str,
         root_id: str | None = None,
@@ -299,17 +323,17 @@ def create_server(settings: Settings) -> FastMCP:
             frontmatter=frontmatter,
         )
 
-    @server.tool(name="read_note")
+    @server.tool(name="read_note", annotations=READ_ONLY_ANNOTATIONS)
     def read_note_tool(root_id: str, path: str) -> dict[str, str]:
         """Read a Markdown note and its SHA-256 for a safe later replacement."""
         return read_note(settings.accessible_root(root_id), path).to_dict()
 
-    @server.tool(name="list_roots")
+    @server.tool(name="list_roots", annotations=READ_ONLY_ANNOTATIONS)
     def list_roots_tool() -> list[dict[str, object]]:
         """List configured roots, their filesystem paths, and read/write capabilities."""
         return describe_roots(settings)
 
-    @server.tool(name="list_notes")
+    @server.tool(name="list_notes", annotations=READ_ONLY_ANNOTATIONS)
     def list_notes_tool(
         root_id: str | None = None,
         path_prefix: str | None = None,
@@ -345,7 +369,9 @@ def create_server(settings: Settings) -> FastMCP:
             """Keep successful writes compact unless the caller requests the body."""
             return note.to_dict() if include_content else note.to_reference_dict()
 
-        @server.tool(name="write_note")
+        @server.tool(
+            name="write_note", annotations=WRITE_DESTRUCTIVE_ANNOTATIONS
+        )
         def write_note_tool(
             root_id: str,
             path: str,
@@ -386,7 +412,9 @@ def create_server(settings: Settings) -> FastMCP:
             )
             return write_result(note, include_content)
 
-        @server.tool(name="append_note")
+        @server.tool(
+            name="append_note", annotations=WRITE_NONDESTRUCTIVE_ANNOTATIONS
+        )
         def append_note_tool(
             root_id: str,
             path: str,
@@ -410,7 +438,9 @@ def create_server(settings: Settings) -> FastMCP:
             )
             return write_result(note, include_content)
 
-        @server.tool(name="move_note")
+        @server.tool(
+            name="move_note", annotations=WRITE_NONDESTRUCTIVE_ANNOTATIONS
+        )
         def move_note_tool(
             source_root_id: str,
             source_path: str,
@@ -440,7 +470,9 @@ def create_server(settings: Settings) -> FastMCP:
             )
             return write_result(note, include_content)
 
-        @server.tool(name="update_managed_blocks")
+        @server.tool(
+            name="update_managed_blocks", annotations=WRITE_DESTRUCTIVE_ANNOTATIONS
+        )
         def update_managed_blocks_tool(
             root_id: str,
             path: str,
@@ -474,7 +506,9 @@ def create_server(settings: Settings) -> FastMCP:
             )
             return write_result(note, include_content)
 
-        @server.tool(name="batch_update_notes")
+        @server.tool(
+            name="batch_update_notes", annotations=WRITE_DESTRUCTIVE_ANNOTATIONS
+        )
         def batch_update_notes_tool(
             root_id: str,
             operations: list[BatchOperationInput],
